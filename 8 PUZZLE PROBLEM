@@ -1,0 +1,64 @@
+class Solution:
+    def solve(self, board):
+        board_tuple = tuple(sum(board, []))  # Flatten the board into a tuple
+        target = (0, 1, 2, 3, 4, 5, 6, 7, 8)  # Goal state
+        
+        if board_tuple == target:
+            return 0  # Already solved
+        
+        queue = [board_tuple]
+        visited = {board_tuple: 0}  # Dictionary to store states and their distances
+        
+        return self.get_paths(queue, visited, target)
+
+    def get_paths(self, queue, visited, target):
+        cnt = 0  # Move count
+        
+        while queue:
+            new_queue = []
+            for node in queue:
+                next_moves = self.find_next(node)
+                for move in next_moves:
+                    if move not in visited:
+                        visited[move] = cnt + 1
+                        if move == target:
+                            return cnt + 1  # Found the solution
+                        new_queue.append(move)
+            queue = new_queue
+            cnt += 1
+        
+        return -1  # No solution found
+
+    def find_next(self, node):
+        # Possible swaps based on empty tile (0) position
+        moves = {
+            0: [1, 3],
+            1: [0, 2, 4],
+            2: [1, 5],
+            3: [0, 4, 6],
+            4: [1, 3, 5, 7],
+            5: [2, 4, 8],
+            6: [3, 7],
+            7: [4, 6, 8],
+            8: [5, 7]
+        }
+
+        results = []
+        pos_0 = node.index(0)  # Find position of empty tile
+        
+        for move in moves[pos_0]:
+            new_node = list(node)
+            new_node[pos_0], new_node[move] = new_node[move], new_node[pos_0]
+            results.append(tuple(new_node))  # Store as tuple for immutability
+        
+        return results
+
+
+# Example usage
+ob = Solution()
+matrix = [
+    [3, 1, 2],
+    [4, 7, 5],
+    [6, 8, 0]  # 0 represents the empty space
+]
+print(ob.solve(matrix))  # Output: Minimum number of moves to solve
